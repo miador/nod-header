@@ -172,6 +172,32 @@ jobs:
             firefox) firefox --version ;;
           esac
 
+      # Edge ships on the runner image with its setuid sandbox helper owned by
+      # the wrong user, and a Chromium refuses to start at all rather than run
+      # unsandboxed: "The SUID sandbox helper binary was found, but is not
+      # configured correctly." Chrome's copy is installed correctly, so this is
+      # Edge's alone.
+      #
+      # The alternative is passing --no-sandbox, which the harness deliberately
+      # does not do: it would mean the suite tests an unsandboxed browser from
+      # then on, in every job, to work around a wrong file mode. Fixing the mode
+      # keeps what CI drives the same as what a user runs. If a future image
+      # breaks this differently, the browser's own stderr says so and this step
+      # is where to look.
+      - name: Give Edge back its sandbox
+        if: matrix.browser == 'edge'
+        run: |
+          set -euo pipefail
+          helper=/opt/microsoft/msedge/msedge-sandbox
+          if [ ! -e "$helper" ]; then
+            echo "::warning::$helper is not there; the image may have moved it"
+            exit 0
+          fi
+          echo "before: $(ls -l "$helper")"
+          sudo chown root:root "$helper"
+          sudo chmod 4755 "$helper"
+          echo "after:  $(ls -l "$helper")"
+
       # --require makes a missing browser fail the job instead of skipping,
       # so a green run always means a real browser was driven.
       - name: Integration tests
