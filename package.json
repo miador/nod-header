@@ -1,6 +1,6 @@
 {
   "name": "nod-header",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Nod Header — send additional request and response headers. A ModHeader replacement for Chrome, Edge and Firefox.",
   "private": true,
   "type": "module",
