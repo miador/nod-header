@@ -1,0 +1,33 @@
+{
+  "name": "nod-header",
+  "version": "1.0.0",
+  "description": "Nod Header — send additional request and response headers. A ModHeader replacement for Chrome, Edge and Firefox.",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:chrome": "node scripts/build.mjs --target=chrome",
+    "build:firefox": "node scripts/build.mjs --target=firefox",
+    "zip": "node scripts/build.mjs --target=all --zip",
+    "icons": "node scripts/make-icons.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:ci": "eslint . -f compact",
+    "check:placeholders": "node scripts/check-placeholders.mjs",
+    "test": "node --test",
+    "test:unit": "node --test",
+    "test:integration": "node scripts/integration.mjs",
+    "clean": "node -e \"import('node:fs').then(fs=>fs.rmSync('dist',{recursive:true,force:true}))\""
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.1.0",
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^2.0.1",
+    "eslint": "^10.8.0",
+    "eslint-formatter-compact": "^9.0.1"
+  }
+}

@@ -1,0 +1,8 @@
+dist/
+node_modules/
+*.zip
+.DS_Store
+.playwright-mcp/
+*.log
+.idea/
+.vscode/

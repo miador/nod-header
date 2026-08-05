@@ -1,0 +1,114 @@
+/* Nod Header — design tokens and base rules shared by every extension page.
+   Colour and geometry are sampled from the reference design; the popup panel
+   measures 1257px there and 780px here, a scale factor of 0.6205. */
+
+:root {
+  /* surfaces */
+  --fx-navy: #072143;
+  --fx-surface: #ffffff;
+  --fx-surface-sub: #f9fafc;
+  --fx-surface-hover: #f4f6fa;
+
+  /* brand + accents */
+  --fx-blue: #1a74f2;
+  --fx-blue-hover: #1568de;
+  --fx-blue-text: #0a62f0;
+  --fx-blue-soft: #e1edfc;
+  --fx-blue-soft-hover: #d2e4fb;
+  --fx-green: #21ae45;
+  --fx-amber: #e0930d;
+  --fx-red: #d92d20;
+  --fx-red-soft: #fef3f2;
+
+  /* type */
+  --fx-text: #0f1c31;
+  --fx-text-mid: #3b4a5f;
+  --fx-text-muted: #6b7688;
+  --fx-text-faint: #949daa;
+  --fx-text-off: #aeb6c4;
+
+  /* lines + icons */
+  --fx-border: #dbe1e9;
+  --fx-border-strong: #cbd3df;
+  --fx-border-soft: #e9ecf1;
+  --fx-divider: #dde2e9;
+  --fx-separator: #edeff3;
+  --fx-icon: #6b7688;
+  --fx-icon-quiet: #a8b0bd;
+  --fx-icon-off: #c4cad6;
+  --fx-track: #c3c8d1;
+
+  /* the toast floats over the panel, so it carries its own surface */
+  --fx-toast: #10233d;
+  --fx-ring: rgba(26, 116, 242, .16);
+
+  --fx-shadow-menu: 0 12px 32px rgba(9, 26, 51, .16), 0 2px 6px rgba(9, 26, 51, .08);
+  --fx-shadow-sheet: 0 24px 60px rgba(9, 26, 51, .28);
+  --fx-radius: 8px;
+
+  --fx-font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI",
+    Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  --fx-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+html[data-theme="dark"] {
+  --fx-navy: #061a35;
+  --fx-surface: #101826;
+  --fx-surface-sub: #0c1420;
+  --fx-surface-hover: #182335;
+  --fx-blue-soft: #16294a;
+  --fx-blue-soft-hover: #1c3358;
+  --fx-blue-text: #6aa8ff;
+  --fx-red-soft: #2c1518;
+  --fx-text: #e8edf5;
+  --fx-text-mid: #b3bccb;
+  --fx-text-muted: #8b96a8;
+  --fx-text-faint: #74808f;
+  --fx-text-off: #5b6675;
+  --fx-border: #29354a;
+  --fx-border-strong: #3a4761;
+  --fx-border-soft: #202b3d;
+  --fx-divider: #222d40;
+  --fx-separator: #1a2434;
+  --fx-icon: #98a3b4;
+  --fx-icon-quiet: #6d7889;
+  --fx-icon-off: #475263;
+  --fx-track: #3a4761;
+  /* clearly lighter than the dark surface, or the toast disappears into it */
+  --fx-toast: #2b3b56;
+  --fx-shadow-menu: 0 12px 32px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
+  --fx-shadow-sheet: 0 24px 60px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+/* A class that sets `display` would otherwise beat the UA rule for [hidden],
+   leaving a "hidden" element laid out. Everything here toggles with [hidden]. */
+[hidden] { display: none !important; }
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.ic { width: 20px; height: 20px; flex: none; display: block; }
+.ic--12 { width: 12px; height: 12px; }
+.ic--14 { width: 14px; height: 14px; }
+.ic--16 { width: 16px; height: 16px; }
+.ic--18 { width: 18px; height: 18px; }
+.ic--20 { width: 20px; height: 20px; }
+.ic--22 { width: 22px; height: 22px; }
+.ic--grip { width: 8px; height: 13px; }
+
+button { font: inherit; color: inherit; }
+
+:where(button, input, select, textarea, a, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--fx-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .001s !important;
+    animation-duration: .001s !important;
+  }
+}

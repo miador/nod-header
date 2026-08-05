@@ -1,0 +1,219 @@
+# Cut a release, and keep package.json's version the truth about it.
+#
+# There are two ways in, and both leave package.json holding the released
+# version:
+#
+#   1. Run this workflow (Actions -> Release -> Run workflow) and pick major,
+#      minor or patch. It bumps package.json, commits, tags, and creates the
+#      GitHub release with the store packages attached. This is the normal path:
+#      the tag and the bumped package.json are the same commit.
+#
+#   2. Create a release by hand in the GitHub UI with a tag like v1.4.0. This
+#      workflow then syncs package.json on the default branch to 1.4.0, commits
+#      it, and attaches the packages built at that version.
+#
+# Path 1 cannot trigger path 2: a release created with GITHUB_TOKEN does not
+# raise a `release` event, and a push made with GITHUB_TOKEN does not start
+# another workflow run. That is also why the version-bump commit does not
+# re-trigger CI.
+#
+# Only first-party GitHub actions are used. The release itself is created with
+# the gh CLI, which is preinstalled on GitHub-hosted runners, so no third-party
+# release action is involved.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Which part of the version to increase'
+        type: choice
+        required: true
+        default: patch
+        options: [patch, minor, major]
+      version:
+        description: 'Exact version instead of a bump, e.g. 1.4.0 (optional)'
+        type: string
+        required: false
+      draft:
+        description: 'Create the release as a draft'
+        type: boolean
+        required: false
+        default: false
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      # Check out a branch, never a tag: the bump has to land somewhere a person
+      # will branch from next, and a tag is not that. A hand-made release syncs
+      # the default branch; a dispatched run uses the branch it was started from,
+      # so a release branch works too.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.repository.default_branch || github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      # A hand-made release names a tag, but the checkout above is a branch, so
+      # the packages would be built from whatever the branch holds now. That is
+      # the same commit in the normal case — you tag the head of the branch — and
+      # a different one if the branch has moved on since, which would attach
+      # packages built from code the tag does not contain. Stop rather than
+      # publish an artifact that does not match its tag.
+      - name: The tag is the commit being built
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          tagged="$(git rev-parse "refs/tags/$TAG^{commit}")"
+          head="$(git rev-parse HEAD)"
+          if [ "$tagged" != "$head" ]; then
+            echo "::error::$TAG is $tagged but ${{ github.event.repository.default_branch }} is at $head."
+            echo "::error::Packages built here would not match the tag. Use the Release workflow's"
+            echo "::error::Run workflow button instead, which tags the commit it builds."
+            exit 1
+          fi
+          echo "$TAG and HEAD are both $head"
+
+      # Placeholders are an error here, not the warning CI settles for: SECURITY.md
+      # links to the private-advisory form, and publishing with that link pointing
+      # nowhere sends the next reporter to a public issue.
+      - name: No placeholders left
+        run: node scripts/check-placeholders.mjs --strict
+
+      # Nothing gets released that does not build and pass its unit tests.
+      # The integration suite runs in CI against real browsers; repeating it
+      # here would gate the release on browser availability, so the CI run for
+      # this commit is the gate for that.
+      - name: Unit tests
+        run: node --test
+
+      - name: Decide the version
+        id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          BUMP: ${{ inputs.bump }}
+          EXPLICIT: ${{ inputs.version }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "release" ]; then
+            # The tag the human chose is the version. scripts/version.mjs
+            # rejects anything that is not MAJOR.MINOR.PATCH, including the
+            # prerelease suffixes a browser manifest cannot carry.
+            version="$(node scripts/version.mjs --set="$TAG")"
+            tag="$TAG"
+          elif [ -n "$EXPLICIT" ]; then
+            version="$(node scripts/version.mjs --set="$EXPLICIT")"
+            tag="v$version"
+          else
+            version="$(node scripts/version.mjs --bump="$BUMP")"
+            tag="v$version"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version as $tag"
+
+      - name: Build the store packages
+        run: node scripts/build.mjs --target=all --zip
+
+      - name: Check the packages carry that version
+        env:
+          VERSION: ${{ steps.pick.outputs.version }}
+        run: |
+          set -euo pipefail
+          for target in chrome firefox; do
+            actual="$(node -e "process.stdout.write(require('./dist/$target/manifest.json').version)")"
+            test "$actual" = "$VERSION" || {
+              echo "::error::dist/$target/manifest.json is $actual, expected $VERSION"
+              exit 1
+            }
+          done
+          test -f "dist/nod-header-chrome-$VERSION.zip"
+          test -f "dist/nod-header-firefox-$VERSION.zip"
+          ls -l dist/*.zip
+
+      # Mozilla's own validator, the same one AMO runs on upload. An npm package
+      # run through npx, not an action, and never a dependency of this project.
+      - name: Validate the Firefox package
+        run: npx --yes addons-linter@10 dist/nod-header-firefox-${{ steps.pick.outputs.version }}.zip
+
+      # If the default branch is protected, give this workflow an exception or
+      # the push below is where a release will stop.
+      - name: Commit the version bump
+        env:
+          VERSION: ${{ steps.pick.outputs.version }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- package.json; then
+            echo "package.json was already at $VERSION, nothing to commit"
+            exit 0
+          fi
+          # The branch checkout put us on, whichever of the two paths we came in
+          # by, so the push never needs to guess a name.
+          branch="$(git rev-parse --abbrev-ref HEAD)"
+          if [ "$branch" = "HEAD" ]; then
+            echo "::error::detached HEAD, so there is no branch to push the bump to"
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json
+          git commit -m "Release $VERSION"
+          git push origin "HEAD:refs/heads/$branch"
+
+      # Only the dispatch path creates the release; the release path is already
+      # looking at one that exists.
+      - name: Create the release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.pick.outputs.tag }}
+          VERSION: ${{ steps.pick.outputs.version }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::$TAG already exists — pick a different version"
+            exit 1
+          fi
+          args=(--title "Nod Header $VERSION" --generate-notes --target "$(git rev-parse HEAD)")
+          if [ "$DRAFT" = "true" ]; then args+=(--draft); fi
+          gh release create "$TAG" "${args[@]}" \
+            "dist/nod-header-chrome-$VERSION.zip" \
+            "dist/nod-header-firefox-$VERSION.zip"
+
+      - name: Attach the packages to the existing release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.pick.outputs.tag }}
+          VERSION: ${{ steps.pick.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" \
+            "dist/nod-header-chrome-$VERSION.zip" \
+            "dist/nod-header-firefox-$VERSION.zip" \
+            --clobber
+
+      - name: Keep the packages on the workflow run too
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ steps.pick.outputs.version }}
+          path: dist/*.zip
+          if-no-files-found: error

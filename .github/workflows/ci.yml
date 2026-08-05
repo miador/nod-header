@@ -1,0 +1,205 @@
+# Build, unit-test and integration-test every change.
+#
+# Only first-party GitHub actions are used here (actions/checkout,
+# actions/setup-node, actions/upload-artifact, actions/download-artifact).
+# The browsers come preinstalled on the GitHub-hosted Ubuntu images, so no
+# third-party setup action is needed to get Chrome, Edge or Firefox.
+#
+# The project has no dependencies, so there is no install step and no lockfile
+# to cache — every job is checkout, set up Node, run Node.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      # The only job that installs anything. ESLint and its plugins are the
+      # project's sole dependencies, they are development-only, and nothing from
+      # them reaches a published package — which is why every other job here
+      # still runs with no install step at all.
+      - name: Install the lint toolchain
+        run: npm ci
+
+      # Compact format is one line per problem, which is what makes a CI log
+      # readable and greppable.
+      - name: Lint
+        run: npm run lint:ci
+
+      # A warning here, an error in the release workflow. Nothing is blocked
+      # while the repository is still being set up, but the list stays visible on
+      # every run instead of being remembered.
+      - name: Placeholders left in the documents
+        run: node scripts/check-placeholders.mjs
+
+  unit:
+    name: unit (node ${{ matrix.node }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Node 20 is the floor the package declares support for in practice;
+        # macOS and Windows are here because the build writes paths and zip
+        # entries by hand, and those are exactly the things that differ per OS.
+        include:
+          - { os: ubuntu-latest, node: '20' }
+          - { os: ubuntu-latest, node: '22' }
+          - { os: ubuntu-latest, node: '24' }
+          - { os: macos-latest, node: '22' }
+          - { os: windows-latest, node: '22' }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Unit tests
+        run: node --test
+
+      - name: Build both targets
+        run: node scripts/build.mjs --target=all --zip
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Read the version
+        id: version
+        run: echo "version=$(node scripts/version.mjs)" >> "$GITHUB_OUTPUT"
+
+      - name: Build both targets
+        run: node scripts/build.mjs --target=all --zip
+
+      - name: Both manifests carry the package version
+        run: |
+          set -euo pipefail
+          expected="$(node scripts/version.mjs)"
+          for target in chrome firefox; do
+            actual="$(node -e "process.stdout.write(require('./dist/$target/manifest.json').version)")"
+            echo "$target manifest: $actual"
+            test "$actual" = "$expected" || {
+              echo "::error::dist/$target/manifest.json is $actual, package.json is $expected"
+              exit 1
+            }
+          done
+
+      # The unpacked trees are what the integration jobs load, so they test the
+      # exact bytes this job produced rather than building their own copy.
+      - name: Upload unpacked builds
+        uses: actions/upload-artifact@v7
+        with:
+          name: unpacked
+          # Two directories with dist/ as their common root, so downloading into
+          # dist/ puts them back exactly where the harness looks for them.
+          path: |
+            dist/chrome
+            dist/firefox
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload store packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ steps.version.outputs.version }}
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+  integration:
+    name: integration (${{ matrix.browser }}${{ matrix.label }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { browser: chrome, engine: auto, label: '' }
+          - { browser: edge, engine: auto, label: '' }
+          - { browser: firefox, engine: auto, label: '' }
+          # Every shipping browser now prefers declarativeNetRequest, so the
+          # blocking-webRequest fallback would never be exercised otherwise.
+          - { browser: firefox, engine: webrequest, label: ' + webRequest fallback' }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # The harness drives Chrome over a WebSocket and Node only has a
+          # global WebSocket from 22 onwards.
+          node-version: '24'
+
+      - name: Download unpacked builds
+        uses: actions/download-artifact@v8
+        with:
+          name: unpacked
+          path: dist
+
+      - name: Which browser is this
+        run: |
+          set -euo pipefail
+          case "${{ matrix.browser }}" in
+            chrome) google-chrome --version ;;
+            edge) microsoft-edge --version ;;
+            firefox) firefox --version ;;
+          esac
+
+      # --require makes a missing browser fail the job instead of skipping,
+      # so a green run always means a real browser was driven.
+      - name: Integration tests
+        run: >
+          node scripts/integration.mjs
+          --browser=${{ matrix.browser }}
+          --engine=${{ matrix.engine }}
+          --require
+
+  amo-lint:
+    name: addons-linter
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Download store packages
+        uses: actions/download-artifact@v8
+        with:
+          name: packages-${{ needs.build.outputs.version }}
+          path: dist
+
+      # addons-linter is Mozilla's own validator and the same one AMO runs on
+      # upload. It is an npm package rather than an action, and it is run with
+      # npx so it never becomes a dependency of this project.
+      - name: Validate the Firefox package
+        run: npx --yes addons-linter@10 dist/nod-header-firefox-*.zip

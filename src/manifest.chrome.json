@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Nod Header",
+  "version": "1.0.0",
+  "description": "Add, override and remove HTTP request and response headers. Switch profiles, filter by URL, keep it all local.",
+  "minimum_chrome_version": "116",
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Nod Header",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; style-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; frame-src 'none'"
+  },
+  "permissions": [
+    "declarativeNetRequest",
+    "storage",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "commands": {
+    "toggle-enabled": {
+      "suggested_key": {
+        "default": "Alt+Shift+H",
+        "mac": "Alt+Shift+H"
+      },
+      "description": "Turn Nod Header on or off"
+    }
+  }
+}

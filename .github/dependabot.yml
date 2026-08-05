@@ -1,0 +1,39 @@
+# Keep the two things this repository does not write itself up to date: the lint
+# toolchain, and the action versions the workflows pin by major tag.
+#
+# Dependabot is a GitHub feature rather than an action, so this does not put a
+# third party in the build — the constraint the workflows are written to.
+#
+# Monthly, not weekly. Nothing here ships to a user: the devDependencies are
+# ESLint and its plugins, and an out-of-date lint rule is not a vulnerability. A
+# quieter cadence keeps the pull requests worth reading.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'deps'
+    groups:
+      # ESLint and its plugins move together and their majors are coupled, so one
+      # pull request that either passes `npm run lint` or does not is easier to
+      # judge than five that each half-work.
+      eslint:
+        patterns:
+          - 'eslint'
+          - '@eslint/*'
+          - 'eslint-formatter-*'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'ci'
+    groups:
+      actions:
+        patterns:
+          - '*'

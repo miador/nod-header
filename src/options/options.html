@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light">
+  <title>Nod Header settings</title>
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <!-- ── icon sprite ───────────────────────────────────────────────────── -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="fx-shield-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#57A3FE"/>
+        <stop offset=".55" stop-color="#2C7CF6"/>
+        <stop offset="1" stop-color="#1A66E6"/>
+      </linearGradient>
+    </defs>
+
+    <symbol id="i-mark" viewBox="0 0 61 70">
+      <path fill="url(#fx-shield-grad)" d="M30.5 0.9 6.1 8.2A5.2 5.2 0 0 0 2.4 13.2v22.4c0 15.6 12.2 27.1 26.4 33.1a4.5 4.5 0 0 0 3.4 0c14.2-6 26.4-17.5 26.4-33.1V13.2a5.2 5.2 0 0 0-3.7-5Z"/>
+      <rect x="15.5" y="19.5" width="30" height="5.4" rx="2.7" fill="#fff"/>
+      <rect x="15.5" y="31.5" width="30" height="5.4" rx="2.7" fill="#fff"/>
+      <rect x="19.5" y="44.5" width="20" height="5.4" rx="2.7" fill="#fff"/>
+    </symbol>
+
+    <symbol id="i-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v10.5"/><path d="M7.5 9.5 12 14l4.5-4.5"/><path d="M3.5 16.5v2.2a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2.2"/>
+    </symbol>
+
+    <symbol id="i-export" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 14.5V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M3.5 16.5v2.2a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2.2"/>
+    </symbol>
+
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12.6 9.6 17.2 19 6.8"/>
+    </symbol>
+
+    <symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16.1 3.6a2.1 2.1 0 0 1 3 0l1.3 1.3a2.1 2.1 0 0 1 0 3L9 19.3l-5 1.7 1.7-5Z"/>
+      <path d="M14.6 5.1 18.9 9.4"/>
+    </symbol>
+
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.8 6.4h16.4"/>
+      <path d="M9.4 3.4h5.2"/>
+      <path d="M5.9 6.4l.9 13a1.8 1.8 0 0 0 1.8 1.7h6.8a1.8 1.8 0 0 0 1.8-1.7l.9-13"/>
+      <path d="M10.2 10.4v6.6M13.8 10.4v6.6"/>
+    </symbol>
+
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="11.5" height="11.5" rx="2.2"/>
+      <path d="M15 5.8a2.2 2.2 0 0 0-2.2-2.3H5.7A2.2 2.2 0 0 0 3.5 5.8v7.1a2.2 2.2 0 0 0 2.2 2.2"/>
+    </symbol>
+
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 6l12 12M18 6 6 18"/>
+    </symbol>
+
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.6 21.4 20H2.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.2h.01"/>
+    </symbol>
+  </svg>
+
+  <!-- ── top bar ───────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <svg class="brand__mark" viewBox="0 0 61 70" aria-hidden="true"><use href="#i-mark"/></svg>
+        <h1 class="brand__name">Nod Header</h1>
+        <span class="brand__sub">Settings</span>
+      </div>
+
+      <label class="power" for="powerToggle">
+        <span class="power__text" id="powerText">Enabled</span>
+        <input type="checkbox" id="powerToggle" class="sw__input" role="switch">
+        <span class="sw sw--lg" aria-hidden="true"><span class="sw__knob"></span></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- ── nav ─────────────────────────────────────────────────────────── -->
+    <nav class="nav" aria-label="Settings sections">
+      <ul class="nav__list">
+        <li><a class="nav__item" id="nav-general" href="#general">General</a></li>
+        <li><a class="nav__item" id="nav-profiles" href="#profiles">Profiles</a></li>
+        <li><a class="nav__item" id="nav-requests" href="#requests">Requests</a></li>
+        <li><a class="nav__item" id="nav-about" href="#about">About</a></li>
+      </ul>
+    </nav>
+
+    <main class="content">
+      <!-- ── general ───────────────────────────────────────────────────── -->
+      <section class="pane" id="pane-general" aria-labelledby="h-general" hidden>
+        <h2 class="pane__title" id="h-general">General</h2>
+        <p class="pane__lede">Every change saves straight away.</p>
+
+        <div class="card">
+          <div class="setting">
+            <div class="setting__text">
+              <span class="setting__name" id="lbl-theme">Theme</span>
+              <span class="setting__hint">System follows the theme of your operating system.</span>
+            </div>
+            <div class="seg" id="themeSeg" role="radiogroup" aria-labelledby="lbl-theme">
+              <button type="button" class="seg__btn" role="radio" aria-checked="false" data-val="light">Light</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false" data-val="dark">Dark</button>
+              <button type="button" class="seg__btn" role="radio" aria-checked="false" data-val="system">System</button>
+            </div>
+          </div>
+
+          <div class="setting">
+            <div class="setting__text">
+              <label class="setting__name" for="setShowBadge">Show the header count on the toolbar icon</label>
+              <span class="setting__hint">The badge counts the headers the active profile is applying.</span>
+            </div>
+            <label class="sw-wrap">
+              <input type="checkbox" id="setShowBadge" class="sw__input" role="switch">
+              <span class="sw" aria-hidden="true"><span class="sw__knob"></span></span>
+            </label>
+          </div>
+
+          <div class="setting">
+            <div class="setting__text">
+              <label class="setting__name" for="setConfirmDestructive">Confirm before deleting</label>
+              <span class="setting__hint">Ask first when a header or a profile is about to go.</span>
+            </div>
+            <label class="sw-wrap">
+              <input type="checkbox" id="setConfirmDestructive" class="sw__input" role="switch">
+              <span class="sw" aria-hidden="true"><span class="sw__knob"></span></span>
+            </label>
+          </div>
+
+          <div class="setting">
+            <div class="setting__text">
+              <label class="setting__name" for="setShowTargetTag">Show the request or response tag in rows</label>
+              <span class="setting__hint">Marks which side of the exchange each header changes.</span>
+            </div>
+            <label class="sw-wrap">
+              <input type="checkbox" id="setShowTargetTag" class="sw__input" role="switch">
+              <span class="sw" aria-hidden="true"><span class="sw__knob"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <h3 class="pane__sub">Request log</h3>
+        <div class="card">
+          <div class="setting">
+            <div class="setting__text">
+              <label class="setting__name" for="setLogMatches">Log matched requests</label>
+              <span class="setting__hint">Records the requests your headers matched, on this device only.</span>
+            </div>
+            <label class="sw-wrap">
+              <input type="checkbox" id="setLogMatches" class="sw__input" role="switch">
+              <span class="sw" aria-hidden="true"><span class="sw__knob"></span></span>
+            </label>
+          </div>
+
+          <div class="setting">
+            <div class="setting__text">
+              <label class="setting__name" for="setLogLimit">Log size limit</label>
+              <span class="setting__hint" id="logLimitHint">The oldest entries drop once the log is full.</span>
+            </div>
+            <input type="number" class="input input--num" id="setLogLimit" inputmode="numeric" aria-describedby="logLimitHint">
+          </div>
+        </div>
+      </section>
+
+      <!-- ── profiles ──────────────────────────────────────────────────── -->
+      <section class="pane" id="pane-profiles" aria-labelledby="h-profiles" hidden>
+        <h2 class="pane__title" id="h-profiles">Profiles</h2>
+        <p class="pane__lede">Only the active profile applies. Switch the active profile to change which headers are live.</p>
+
+        <div class="toolbar">
+          <button type="button" class="btn btn--ghost" id="importBtn">
+            <svg class="ic ic--16" aria-hidden="true"><use href="#i-import"/></svg><span>Import a file</span>
+          </button>
+          <button type="button" class="btn btn--ghost" id="exportAllBtn">
+            <svg class="ic ic--16" aria-hidden="true"><use href="#i-export"/></svg><span>Export everything</span>
+          </button>
+          <span class="spacer"></span>
+          <span class="toolbar__count" id="profileCount"></span>
+        </div>
+
+        <div class="note note--block" id="importReport" hidden></div>
+
+        <div class="card tablewrap">
+          <table class="tbl tbl--profiles">
+            <caption class="vh">Every profile in this extension</caption>
+            <thead>
+              <tr>
+                <th scope="col">Profile</th>
+                <th scope="col" class="num">Headers</th>
+                <th scope="col" class="num">On</th>
+                <th scope="col">URL filters</th>
+                <th scope="col">State</th>
+                <th scope="col"><span class="vh">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="profileRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── requests ──────────────────────────────────────────────────── -->
+      <section class="pane" id="pane-requests" aria-labelledby="h-requests" hidden>
+        <h2 class="pane__title" id="h-requests">Requests</h2>
+        <p class="pane__lede">Logging observes the requests your headers matched. It records what was applied and changes nothing.</p>
+
+        <div class="note note--warn" id="logOffNotice" hidden>
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-warn"/></svg>
+          <span>Logging is off, so new requests are not recorded.</span>
+          <button type="button" class="btn btn--primary btn--sm" id="enableLogBtn">Turn on logging</button>
+        </div>
+
+        <div class="toolbar">
+          <label class="srch__label" for="logFilter">Filter</label>
+          <input type="search" class="input input--search" id="logFilter" placeholder="URL or header name" spellcheck="false" autocomplete="off">
+          <span class="toolbar__count" id="logCount"></span>
+          <span class="spacer"></span>
+          <button type="button" class="btn btn--ghost" id="copyLogBtn">
+            <svg class="ic ic--16" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy as JSON</span>
+          </button>
+          <button type="button" class="btn btn--ghost" id="clearLogBtn">
+            <svg class="ic ic--16" aria-hidden="true"><use href="#i-trash"/></svg><span>Clear log</span>
+          </button>
+        </div>
+
+        <div class="card tablewrap">
+          <table class="tbl tbl--log" id="logTable">
+            <caption class="vh">Matched requests, newest first</caption>
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Method</th>
+                <th scope="col">Type</th>
+                <th scope="col">URL</th>
+                <th scope="col">Headers applied</th>
+              </tr>
+            </thead>
+            <tbody id="logRows"></tbody>
+          </table>
+          <p class="empty" id="logEmpty" hidden>No matched requests yet. Open a page that your headers apply to and they will appear here.</p>
+          <p class="empty" id="logNoMatch" hidden>No requests match that filter.</p>
+        </div>
+      </section>
+
+      <!-- ── about ─────────────────────────────────────────────────────── -->
+      <section class="pane" id="pane-about" aria-labelledby="h-about" hidden>
+        <h2 class="pane__title" id="h-about">About</h2>
+        <p class="pane__lede">Nod Header adds, overrides and removes HTTP request and response headers.</p>
+
+        <div class="card card--pad">
+          <dl class="facts">
+            <dt>Version</dt><dd id="aboutVersion">Reading&hellip;</dd>
+            <dt>Engine</dt><dd id="aboutEngine">Reading&hellip;</dd>
+            <dt>Rules loaded</dt><dd id="aboutRules">Reading&hellip;</dd>
+          </dl>
+          <button type="button" class="minibtn" id="refreshDiagnostics">Refresh</button>
+        </div>
+
+        <div class="note note--warn note--block" id="aboutWarnings" hidden></div>
+
+        <h3 class="pane__sub">Keyboard shortcut</h3>
+        <div class="card card--pad">
+          <ul class="shortcuts" id="aboutShortcuts"></ul>
+          <p class="fine">Change it on the browser's own shortcut page. An extension page cannot link there, so copy this address into a new tab:</p>
+          <p class="copyline">
+            <code id="shortcutUrl">chrome://extensions/shortcuts</code>
+            <button type="button" class="minibtn" id="copyShortcutUrl">Copy address</button>
+          </p>
+        </div>
+
+        <h3 class="pane__sub">Why each permission is needed</h3>
+        <div class="card card--pad">
+          <dl class="facts facts--stack">
+            <dt>Storage</dt>
+            <dd>Keeps your profiles, headers and settings on this device.</dd>
+            <dt>Read and change data on the sites you visit</dt>
+            <dd>A header can only be changed on a site the browser lets the extension act on, and this is also how a profile limited to the active tab knows which tab that is. Nothing is read from the page and nothing is sent anywhere.</dd>
+            <dt>Header rules</dt>
+            <dd>The browser applies your rules itself, so the extension never sees the traffic it changes.</dd>
+            <dt id="permWebRequestTerm" hidden>Web requests</dt>
+            <dd id="permWebRequestDesc" hidden>Firefox needs the older blocking request API to change response headers.</dd>
+          </dl>
+        </div>
+
+        <h3 class="pane__sub">Reset</h3>
+        <div class="card card--pad">
+          <p class="fine">Restoring defaults removes every profile and header, clears the request log and puts the settings back the way they started.</p>
+          <button type="button" class="btn btn--danger" id="resetBtn">Restore defaults</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ── profile row template ──────────────────────────────────────────── -->
+  <template id="profileRowTpl">
+    <tr class="prow">
+      <th scope="row" class="prow__name">
+        <span class="prow__label">
+          <span class="dot js-color" aria-hidden="true"></span>
+          <span class="js-name"></span>
+          <span class="prow__warn js-warn" hidden>
+            <svg class="ic ic--14" aria-hidden="true"><use href="#i-warn"/></svg>
+            <span class="vh js-warn-text"></span>
+          </span>
+        </span>
+      </th>
+      <td class="num js-headers"></td>
+      <td class="num js-on"></td>
+      <td class="prow__filters js-filters"></td>
+      <td class="js-state"></td>
+      <td class="prow__actions">
+        <button type="button" class="iconbtn js-activate">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-check"/></svg>
+        </button>
+        <button type="button" class="iconbtn js-rename">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-pencil"/></svg>
+        </button>
+        <button type="button" class="iconbtn js-duplicate">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-copy"/></svg>
+        </button>
+        <button type="button" class="iconbtn js-export">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-export"/></svg>
+        </button>
+        <button type="button" class="iconbtn iconbtn--danger js-delete">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-trash"/></svg>
+        </button>
+      </td>
+    </tr>
+  </template>
+
+  <!-- ── log row template ──────────────────────────────────────────────── -->
+  <template id="logRowTpl">
+    <tr class="lrow">
+      <td class="lrow__time js-time"></td>
+      <td class="lrow__method js-method"></td>
+      <td class="lrow__type js-type"></td>
+      <td class="lrow__url"><span class="url js-url"></span></td>
+      <td class="lrow__applied js-applied"></td>
+    </tr>
+  </template>
+
+  <!-- ── profile name dialog ───────────────────────────────────────────── -->
+  <dialog class="sheet sheet--sm" id="nameSheet">
+    <form method="dialog" class="sheet__form">
+      <div class="sheet__head">
+        <h2 class="sheet__title" id="nameTitle">Rename profile</h2>
+        <button type="button" class="iconbtn js-close" aria-label="Close">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="sheet__body">
+        <label class="fld"><span class="fld__label">Profile name</span>
+          <input type="text" class="input" id="profileName" maxlength="60" placeholder="Development API" required>
+        </label>
+      </div>
+      <div class="sheet__foot">
+        <span class="spacer"></span>
+        <button type="button" class="btn btn--ghost js-close">Cancel</button>
+        <button type="submit" class="btn btn--primary" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── confirm dialog ────────────────────────────────────────────────── -->
+  <dialog class="sheet sheet--sm" id="confirmSheet">
+    <form method="dialog" class="sheet__form">
+      <div class="sheet__head">
+        <h2 class="sheet__title" id="confirmTitle">Are you sure?</h2>
+      </div>
+      <div class="sheet__body">
+        <p class="sheet__lede" id="confirmBody"></p>
+      </div>
+      <div class="sheet__foot">
+        <span class="spacer"></span>
+        <button type="submit" class="btn btn--ghost" value="cancel">Cancel</button>
+        <button type="submit" class="btn btn--danger" value="ok" id="confirmOk">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

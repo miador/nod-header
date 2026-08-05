@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light">
+  <title>Nod Header</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- ── icon sprite ───────────────────────────────────────────────────── -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="fx-shield-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#57A3FE"/>
+        <stop offset=".55" stop-color="#2C7CF6"/>
+        <stop offset="1" stop-color="#1A66E6"/>
+      </linearGradient>
+    </defs>
+
+    <symbol id="i-mark" viewBox="0 0 61 70">
+      <path fill="url(#fx-shield-grad)" d="M30.5 0.9 6.1 8.2A5.2 5.2 0 0 0 2.4 13.2v22.4c0 15.6 12.2 27.1 26.4 33.1a4.5 4.5 0 0 0 3.4 0c14.2-6 26.4-17.5 26.4-33.1V13.2a5.2 5.2 0 0 0-3.7-5Z"/>
+      <rect x="15.5" y="19.5" width="30" height="5.4" rx="2.7" fill="#fff"/>
+      <rect x="15.5" y="31.5" width="30" height="5.4" rx="2.7" fill="#fff"/>
+      <rect x="19.5" y="44.5" width="20" height="5.4" rx="2.7" fill="#fff"/>
+    </symbol>
+
+    <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3.2"/>
+      <path d="M19.5 14.3a7.8 7.8 0 0 0 0-4.6l1.7-1.3-1.9-3.3-2 .8a7.8 7.8 0 0 0-4-2.3L13 1.5h-3.8L8.7 3.6a7.8 7.8 0 0 0-4 2.3l-2-.8L.8 8.4l1.7 1.3a7.8 7.8 0 0 0 0 4.6L.8 15.6l1.9 3.3 2-.8a7.8 7.8 0 0 0 4 2.3l.5 2.1H13l.5-2.1a7.8 7.8 0 0 0 4-2.3l2 .8 1.9-3.3Z" transform="translate(1.1 .6) scale(.955)"/>
+    </symbol>
+
+    <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5.5 9 12 15.5 18.5 9"/>
+    </symbol>
+
+    <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 5.5 15.5 12 9 18.5"/>
+    </symbol>
+
+    <symbol id="i-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v10.5"/><path d="M7.5 9.5 12 14l4.5-4.5"/><path d="M3.5 16.5v2.2a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2.2"/>
+    </symbol>
+
+    <symbol id="i-export" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 14.5V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M3.5 16.5v2.2a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-2.2"/>
+    </symbol>
+
+    <symbol id="i-dots" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/>
+    </symbol>
+
+    <symbol id="i-grip" viewBox="0 0 10 16" fill="currentColor" stroke="none">
+      <circle cx="2.1" cy="2.1" r="1.55"/><circle cx="7.9" cy="2.1" r="1.55"/>
+      <circle cx="2.1" cy="8" r="1.55"/><circle cx="7.9" cy="8" r="1.55"/>
+      <circle cx="2.1" cy="13.9" r="1.55"/><circle cx="7.9" cy="13.9" r="1.55"/>
+    </symbol>
+
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12.6 9.6 17.2 19 6.8"/>
+    </symbol>
+
+    <symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16.1 3.6a2.1 2.1 0 0 1 3 0l1.3 1.3a2.1 2.1 0 0 1 0 3L9 19.3l-5 1.7 1.7-5Z"/>
+      <path d="M14.6 5.1 18.9 9.4"/>
+    </symbol>
+
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.8 6.4h16.4"/>
+      <path d="M9.4 3.4h5.2"/>
+      <path d="M5.9 6.4l.9 13a1.8 1.8 0 0 0 1.8 1.7h6.8a1.8 1.8 0 0 0 1.8-1.7l.9-13"/>
+      <path d="M10.2 10.4v6.6M13.8 10.4v6.6"/>
+    </symbol>
+
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 4v16M4 12h16"/>
+    </symbol>
+
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 6l12 12M18 6 6 18"/>
+    </symbol>
+
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="11.5" height="11.5" rx="2.2"/>
+      <path d="M15 5.8a2.2 2.2 0 0 0-2.2-2.3H5.7A2.2 2.2 0 0 0 3.5 5.8v7.1a2.2 2.2 0 0 0 2.2 2.2"/>
+    </symbol>
+
+    <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3.5 5.5h17l-6.6 7.8v5.7l-3.8 1.9v-7.6Z"/>
+    </symbol>
+
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.6 21.4 20H2.6Z"/><path d="M12 9.6v4.6"/><path d="M12 17.2h.01"/>
+    </symbol>
+  </svg>
+
+  <!-- ── app ───────────────────────────────────────────────────────────── -->
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand__mark" viewBox="0 0 61 70" aria-hidden="true"><use href="#i-mark"/></svg>
+        <h1 class="brand__name">Nod Header</h1>
+      </div>
+
+      <div class="topbar__end">
+        <label class="power" for="powerToggle">
+          <span class="power__text" id="powerText">Enabled</span>
+          <input type="checkbox" id="powerToggle" class="sw__input" role="switch">
+          <span class="sw sw--lg" aria-hidden="true"><span class="sw__knob"></span></span>
+        </label>
+        <span class="topbar__rule" aria-hidden="true"></span>
+        <button type="button" id="openOptions" class="iconbtn iconbtn--dark" title="Settings" aria-label="Settings">
+          <svg class="ic ic--22" aria-hidden="true"><use href="#i-gear"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="profilebar">
+      <label class="profilebar__label" for="profileSelect">Profile</label>
+      <div class="select">
+        <select id="profileSelect" class="select__input" aria-label="Active profile"></select>
+        <svg class="select__chevron ic ic--20" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+      </div>
+
+      <div class="profilebar__end">
+        <button type="button" id="importBtn" class="txtbtn">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-import"/></svg><span>Import</span>
+        </button>
+        <span class="vrule" aria-hidden="true"></span>
+        <button type="button" id="exportBtn" class="txtbtn">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-export"/></svg><span>Export</span>
+        </button>
+        <span class="vrule" aria-hidden="true"></span>
+        <button type="button" id="moreBtn" class="boxbtn" aria-haspopup="true" aria-expanded="false" title="Profile actions" aria-label="Profile actions">
+          <svg class="ic ic--16" aria-hidden="true"><use href="#i-dots"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="grid__head" role="row">
+        <span class="grid__th grid__th--name">Header</span>
+        <span class="grid__th grid__th--value">Value</span>
+        <span class="grid__th grid__th--action">Action</span>
+      </div>
+
+      <div class="grid__body" id="rows" role="rowgroup"></div>
+
+      <p class="empty" id="empty" hidden>No headers in this profile yet.</p>
+
+      <div class="grid__add">
+        <button type="button" id="addHeader" class="addbtn">
+          <svg class="ic ic--20" aria-hidden="true"><use href="#i-plus"/></svg><span>Add header</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bulkbar" id="bulkbar" hidden>
+      <span class="bulkbar__count"><b id="bulkCount">0</b> selected</span>
+      <div class="bulkbar__actions">
+        <button type="button" class="minibtn" data-bulk="enable">Enable</button>
+        <button type="button" class="minibtn" data-bulk="disable">Disable</button>
+        <button type="button" class="minibtn" data-bulk="duplicate">Duplicate</button>
+        <button type="button" class="minibtn minibtn--danger" data-bulk="delete">Delete</button>
+        <button type="button" class="minibtn minibtn--quiet" data-bulk="clear">Clear</button>
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <button type="button" class="statusbar__state" id="scopeBtn" title="Choose which URLs these headers apply to">
+        <i class="dot" id="statusDot" data-state="on" aria-hidden="true"></i>
+        <span id="statusText">Rules active</span>
+      </button>
+      <button type="button" id="viewMatched" class="linkbtn">
+        <span>View matched requests</span>
+        <svg class="ic ic--16" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+      </button>
+    </footer>
+  </div>
+
+  <!-- ── row template ──────────────────────────────────────────────────── -->
+  <template id="rowTpl">
+    <div class="row" role="row" draggable="false">
+      <button type="button" class="grip" tabindex="-1" aria-label="Reorder header" title="Drag to reorder">
+        <svg class="ic ic--grip" aria-hidden="true"><use href="#i-grip"/></svg>
+      </button>
+
+      <label class="cb" title="Select header">
+        <input type="checkbox" class="cb__input js-select">
+        <span class="cb__box" aria-hidden="true"><svg class="ic ic--16" aria-hidden="true"><use href="#i-check"/></svg></span>
+      </label>
+
+      <span class="cell cell--combo">
+        <!-- No `list` here on purpose: the browser draws a datalist itself, in its
+             own colours and at its own length, and it would cover the grouped
+             picker this field opens. The picker is the suggestion list. -->
+        <input type="text" class="field field--combo js-name" placeholder="Header name" spellcheck="false"
+               autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list"
+               aria-controls="headerNameMenu" aria-label="Header name">
+        <button type="button" class="combo__btn js-name-menu" aria-haspopup="listbox" aria-expanded="false"
+                title="Choose a common header" aria-label="Choose a common header">
+          <svg class="ic ic--12" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+        </button>
+        <span class="cell__tag js-tag" hidden></span>
+      </span>
+
+      <span class="cell">
+        <input type="text" class="field js-value" placeholder="Value" spellcheck="false"
+               autocomplete="off" list="dlHeaderValues" aria-label="Header value">
+      </span>
+
+      <label class="sw-wrap" title="Enable header">
+        <input type="checkbox" class="sw__input js-enabled" role="switch">
+        <span class="sw" aria-hidden="true"><span class="sw__knob"></span></span>
+      </label>
+
+      <button type="button" class="iconbtn js-edit" title="Edit details" aria-label="Edit header details">
+        <svg class="ic ic--20" aria-hidden="true"><use href="#i-pencil"/></svg>
+      </button>
+
+      <button type="button" class="iconbtn js-delete" title="Remove header" aria-label="Remove header">
+        <svg class="ic ic--20" aria-hidden="true"><use href="#i-trash"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <!-- ── profile menu ──────────────────────────────────────────────────── -->
+  <div class="menu" id="profileMenu" role="menu" hidden>
+    <button type="button" class="menu__item" role="menuitem" data-act="new-profile">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-plus"/></svg>New profile
+    </button>
+    <button type="button" class="menu__item" role="menuitem" data-act="rename-profile">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-pencil"/></svg>Rename profile
+    </button>
+    <button type="button" class="menu__item" role="menuitem" data-act="duplicate-profile">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-copy"/></svg>Duplicate profile
+    </button>
+    <span class="menu__sep" role="separator"></span>
+    <button type="button" class="menu__item" role="menuitem" data-act="filters">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-filter"/></svg>URL filters&hellip;
+    </button>
+    <button type="button" class="menu__item" role="menuitem" data-act="sort">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-chevron-down"/></svg>Sort headers by name
+    </button>
+    <button type="button" class="menu__item" role="menuitem" data-act="copy-json">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-copy"/></svg>Copy profile as JSON
+    </button>
+    <span class="menu__sep" role="separator"></span>
+    <button type="button" class="menu__item menu__item--danger" role="menuitem" data-act="clear-headers">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-trash"/></svg>Remove all headers
+    </button>
+    <button type="button" class="menu__item menu__item--danger" role="menuitem" data-act="delete-profile">
+      <svg class="ic ic--16" aria-hidden="true"><use href="#i-trash"/></svg>Delete profile
+    </button>
+  </div>
+
+  <!-- ── header details dialog ─────────────────────────────────────────── -->
+  <dialog class="sheet" id="headerSheet">
+    <form method="dialog" class="sheet__form" id="headerForm">
+      <div class="sheet__head">
+        <h2 class="sheet__title">Header details</h2>
+        <button type="button" class="iconbtn js-close" aria-label="Close">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+      <div class="sheet__body">
+        <div class="f2">
+          <label class="fld"><span class="fld__label">Name</span>
+            <input type="text" class="input" id="hdName" spellcheck="false" autocomplete="off"
+                   list="dlHeaderNames" placeholder="X-Request-Id">
+          </label>
+          <label class="fld"><span class="fld__label">Value</span>
+            <input type="text" class="input" id="hdValue" spellcheck="false" autocomplete="off"
+                   list="dlHeaderValues" placeholder="abc123">
+          </label>
+        </div>
+
+        <div class="f2">
+          <div class="fld"><span class="fld__label">Applies to</span>
+            <div class="seg" id="hdTarget" role="radiogroup" aria-label="Applies to">
+              <button type="button" class="seg__btn" data-val="request" role="radio">Request</button>
+              <button type="button" class="seg__btn" data-val="response" role="radio">Response</button>
+            </div>
+          </div>
+          <div class="fld"><span class="fld__label">Operation</span>
+            <div class="seg" id="hdOperation" role="radiogroup" aria-label="Operation">
+              <button type="button" class="seg__btn" data-val="set" role="radio">Set</button>
+              <button type="button" class="seg__btn" data-val="append" role="radio">Append</button>
+              <button type="button" class="seg__btn" data-val="remove" role="radio">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <label class="fld"><span class="fld__label">Comment <em>optional</em></span>
+          <input type="text" class="input" id="hdComment" placeholder="Why this header exists">
+        </label>
+
+        <label class="fld"><span class="fld__label">Only for URLs matching <em>one pattern per line — overrides the profile filters</em></span>
+          <textarea class="input input--area" id="hdInclude" rows="3" spellcheck="false" placeholder="*://api.example.com/*&#10;/^https:\/\/.*\.internal\//"></textarea>
+        </label>
+
+        <div class="fld"><span class="fld__label">Resource types <em>none selected means every type</em></span>
+          <div class="chips" id="hdResourceTypes"></div>
+        </div>
+
+        <p class="hint" id="hdHint" hidden><svg class="ic ic--14" aria-hidden="true"><use href="#i-warn"/></svg><span></span></p>
+      </div>
+
+      <div class="sheet__foot">
+        <button type="button" class="btn btn--danger-ghost js-delete-header">Delete header</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn--ghost js-close">Cancel</button>
+        <button type="submit" class="btn btn--primary" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── profile filters dialog ────────────────────────────────────────── -->
+  <dialog class="sheet" id="filterSheet">
+    <form method="dialog" class="sheet__form" id="filterForm">
+      <div class="sheet__head">
+        <h2 class="sheet__title">URL filters</h2>
+        <button type="button" class="iconbtn js-close" aria-label="Close">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+      <div class="sheet__body">
+        <div class="fld"><span class="fld__label">Apply to</span>
+          <div class="seg" id="flScope" role="radiogroup" aria-label="Apply to">
+            <button type="button" class="seg__btn" data-val="all" role="radio">All sites</button>
+            <button type="button" class="seg__btn" data-val="urls" role="radio">Specific URLs</button>
+          </div>
+        </div>
+
+        <p class="sheet__lede" id="flLede">Headers in this profile are sent only to URLs that match. Leave both boxes empty to send them everywhere.</p>
+
+        <label class="fld"><span class="fld__label">Include <em>one pattern per line</em></span>
+          <textarea class="input input--area" id="flInclude" rows="4" spellcheck="false" placeholder="*://*.example.com/*&#10;https://localhost:*/api/*"></textarea>
+        </label>
+
+        <label class="fld"><span class="fld__label">Exclude <em>wins over include</em></span>
+          <textarea class="input input--area" id="flExclude" rows="3" spellcheck="false" placeholder="*://*.example.com/health*"></textarea>
+        </label>
+
+        <div class="fld"><span class="fld__label">Resource types <em>none selected means every type</em></span>
+          <div class="chips" id="flResourceTypes"></div>
+        </div>
+
+        <label class="fld fld--row">
+          <input type="checkbox" id="flActiveTabOnly" class="cbx">
+          <span>Only apply to the tab that is active when the rules are saved</span>
+        </label>
+
+        <p class="hint" id="flHint" hidden><svg class="ic ic--14" aria-hidden="true"><use href="#i-warn"/></svg><span></span></p>
+
+        <details class="help">
+          <summary>Pattern syntax</summary>
+          <ul>
+            <li><code>*</code> matches any run of characters — <code>*://api.example.com/*</code></li>
+            <li>A bare domain matches that host and its subdomains — <code>example.com</code></li>
+            <li>Wrap in slashes for a regular expression — <code>/^https:\/\/(a|b)\.test\//</code></li>
+          </ul>
+        </details>
+      </div>
+
+      <div class="sheet__foot">
+        <span class="spacer"></span>
+        <button type="button" class="btn btn--ghost js-close">Cancel</button>
+        <button type="submit" class="btn btn--primary" value="save">Save filters</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── profile name dialog ───────────────────────────────────────────── -->
+  <dialog class="sheet sheet--sm" id="nameSheet">
+    <form method="dialog" class="sheet__form" id="nameForm">
+      <div class="sheet__head">
+        <h2 class="sheet__title" id="nameTitle">New profile</h2>
+        <button type="button" class="iconbtn js-close" aria-label="Close">
+          <svg class="ic ic--18" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="sheet__body">
+        <label class="fld"><span class="fld__label">Profile name</span>
+          <input type="text" class="input" id="profileName" maxlength="60" placeholder="Development API" required>
+        </label>
+      </div>
+      <div class="sheet__foot">
+        <span class="spacer"></span>
+        <button type="button" class="btn btn--ghost js-close">Cancel</button>
+        <button type="submit" class="btn btn--primary" id="nameSave" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── confirm dialog ────────────────────────────────────────────────── -->
+  <dialog class="sheet sheet--sm" id="confirmSheet">
+    <form method="dialog" class="sheet__form">
+      <div class="sheet__head">
+        <h2 class="sheet__title" id="confirmTitle">Are you sure?</h2>
+      </div>
+      <div class="sheet__body">
+        <p class="sheet__lede" id="confirmBody"></p>
+      </div>
+      <div class="sheet__foot">
+        <span class="spacer"></span>
+        <button type="submit" class="btn btn--ghost" value="cancel">Cancel</button>
+        <button type="submit" class="btn btn--danger" value="ok" id="confirmOk">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── common header picker ──────────────────────────────────────────── -->
+  <div class="menu menu--list" id="headerNameMenu" role="listbox" aria-label="Common headers" hidden></div>
+
+  <datalist id="dlHeaderNames"></datalist>
+  <datalist id="dlHeaderValues"></datalist>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

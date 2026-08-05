@@ -1,0 +1,905 @@
+@import url("../shared/tokens.css");
+
+/* Nod Header — popup
+   Geometry and colour are derived from the reference design at a panel width
+   of 780px (the design measures 1257px wide; every value below is that
+   measurement scaled by 0.6205 and rounded to a usable CSS value).
+
+   The panel ships at 740px rather than at that 780px. Chrome's popup ceiling is
+   800px, and 20px of slack turned out not to be enough: one zoom step above 100%
+   leaves the panel short of its own design width, and a panel short of its width
+   used to collapse (see the pointer query at the end of this file). The 40px came
+   off the value column alone, so every other track is still the scaled design
+   value. */
+
+:root {
+  /* the row skeleton, shared by the column header and every row */
+  /* Every track is fixed, so a reserved scrollbar gutter cannot be charged to
+     the columns: the head and the rows resolve to identical x positions at any
+     row count. 14 + 17+33+212+294+51+58+44 = 723, leaving the gutter its room. */
+  --fx-cols: 17px 33px 212px 294px 51px 58px 44px;
+  --fx-pad-l: 14px;
+  --fx-pad-r: 17px;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 740px;
+  min-width: 740px;
+  background: var(--fx-surface);
+}
+
+body {
+  font: 400 13.5px/1.45 var(--fx-font);
+  color: var(--fx-text);
+  -webkit-font-smoothing: antialiased;
+  /* The panel is sized to stay under Chrome's 600px popup ceiling, so this only
+     ever acts as a safety valve — but without it a band that did overshoot
+     would be unreachable. The width is fixed, so sideways never scrolls. */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ── top bar ─────────────────────────────────────────────────────────── */
+
+.topbar {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 23px 0 18px;
+  background: var(--fx-navy);
+  color: #fff;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand__mark { width: 38px; height: 44px; flex: none; }
+.brand__name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  white-space: nowrap;
+}
+
+.topbar__end { display: flex; align-items: center; }
+
+.power {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.power__text { font-size: 15px; font-weight: 500; letter-spacing: -.005em; }
+
+.topbar__rule {
+  width: 1px;
+  height: 32px;
+  margin: 0 13px 0 36px;
+  background: rgba(255, 255, 255, .22);
+}
+
+.iconbtn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--fx-icon);
+  cursor: pointer;
+  transition: background-color .12s, color .12s;
+}
+.iconbtn:hover { background: var(--fx-surface-hover); color: var(--fx-text-mid); }
+.iconbtn:disabled { color: var(--fx-icon-off); cursor: default; background: none; }
+
+.iconbtn--dark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: #fff;
+}
+.iconbtn--dark:hover { background: rgba(255, 255, 255, .12); color: #fff; }
+.iconbtn--dark:focus-visible { outline-color: #93bdff; }
+
+/* ── switch ──────────────────────────────────────────────────────────── */
+
+.sw__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sw {
+  position: relative;
+  display: block;
+  width: 30px;
+  height: 16px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--fx-track);
+  transition: background-color .16s ease;
+}
+.sw__knob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(9, 26, 51, .2);
+  transition: transform .16s ease;
+}
+.sw__input:checked + .sw { background: var(--fx-blue); }
+.sw__input:checked + .sw .sw__knob { transform: translateX(14px); }
+.sw__input:focus-visible + .sw { outline: 2px solid var(--fx-blue); outline-offset: 2px; }
+
+.sw--lg { width: 48px; height: 24px; }
+.sw--lg .sw__knob { top: 3px; left: 3px; width: 18px; height: 18px; }
+.sw__input:checked + .sw--lg .sw__knob { transform: translateX(24px); }
+.sw__input:focus-visible + .sw--lg { outline-color: #93bdff; }
+
+.sw-wrap { display: flex; align-items: center; cursor: pointer; }
+
+/* ── profile bar ─────────────────────────────────────────────────────── */
+
+/* The 1px divider counts inside the stated height under border-box, so each of
+   the three banded rules below carries its divider on top of the design's fill. */
+.profilebar {
+  height: 69px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: var(--fx-surface);
+  border-bottom: 1px solid var(--fx-divider);
+}
+
+.profilebar__label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fx-text-mid);
+  margin-right: 17px;
+  white-space: nowrap;
+}
+
+.select { position: relative; width: 225px; flex: none; }
+.select__input {
+  appearance: none;
+  width: 100%;
+  height: 33px;
+  padding: 0 32px 0 11px;
+  font: 500 13.5px/1 var(--fx-font);
+  color: var(--fx-text);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius);
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.select__input:hover { border-color: var(--fx-border-strong); }
+.select__chevron {
+  position: absolute;
+  top: 50%; right: 9px;
+  transform: translateY(-50%);
+  color: var(--fx-text-faint);
+  pointer-events: none;
+}
+
+.profilebar__end { display: flex; align-items: center; margin-left: auto; }
+
+.txtbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 30px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fx-text-mid);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color .12s;
+}
+.txtbtn .ic { color: var(--fx-text-mid); }
+.txtbtn:hover { color: var(--fx-blue-text); }
+.txtbtn:hover .ic { color: var(--fx-blue-text); }
+
+.vrule { width: 1px; height: 20px; margin: 0 15px; background: var(--fx-border-soft); }
+/* the rule before the three-dot button sits tighter to it, as in the design */
+.vrule:last-of-type { margin-right: 8px; }
+
+.boxbtn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface);
+  color: var(--fx-text-faint);
+  cursor: pointer;
+  transition: border-color .12s, color .12s, background-color .12s;
+}
+.boxbtn:hover { border-color: var(--fx-border-strong); color: var(--fx-text-mid); }
+.boxbtn[aria-expanded="true"] { border-color: var(--fx-blue); color: var(--fx-blue-text); }
+
+/* ── header grid ─────────────────────────────────────────────────────── */
+
+.grid { background: var(--fx-surface); }
+
+.grid__head,
+.row {
+  display: grid;
+  grid-template-columns: var(--fx-cols);
+  align-items: center;
+  padding-left: var(--fx-pad-l);
+  padding-right: var(--fx-pad-r);
+}
+
+.grid__head {
+  height: 34px;
+  background: var(--fx-surface-sub);
+  border-bottom: 1px solid var(--fx-border-soft);
+}
+.grid__th {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fx-text-muted);
+  letter-spacing: .005em;
+}
+.grid__th--name   { grid-column: 2 / span 2; padding-left: 15px; }
+.grid__th--value  { grid-column: 4; padding-left: 11px; }
+.grid__th--action { grid-column: 6 / span 2; padding-left: 38px; }
+
+/* The tallest panel has to fit Chrome's 600px popup ceiling, and the bulk bar
+   can appear at any time: 68 topbar + 69 profile bar + 34 head + 55 add row
+   + 40 bulk bar + 47 status bar = 313px of fixed bands, so the scroller gets
+   276px — six 46px rows — for a 589px panel. */
+.grid__body {
+  max-height: 276px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--fx-border-strong) transparent;
+}
+
+.row {
+  /* The row is the containing block for its own hidden checkbox inputs. Left to
+     the viewport they escape the scroller's clip and grow the document by the
+     height of the rows scrolled out of sight, which the body's overflow-y would
+     then answer with a scrollbar over the panel. */
+  position: relative;
+  height: 46px;
+  /* the tracks already end 17px short of the panel, so no right padding here —
+     that space is what the scroll gutter occupies */
+  padding-right: 0;
+  border-bottom: 1px solid var(--fx-separator);
+  background: var(--fx-surface);
+}
+.row:last-child { border-bottom: 1px solid var(--fx-separator); }
+
+.row > .grip { grid-column: 1; }
+.row > .cb { grid-column: 2; padding-left: 15px; }
+.row > .cell:nth-of-type(1) { grid-column: 3; padding-left: 13px; }
+/* 11px, the same inset as .grid__th--value, so the field starts under its label */
+.row > .cell:nth-of-type(2) { grid-column: 4; padding-left: 11px; }
+.row > .sw-wrap { grid-column: 5; padding-left: 21px; }
+.row > .js-edit { grid-column: 6; padding-left: 0; margin-left: 32px; }
+.row > .js-delete { grid-column: 7; padding-left: 0; margin-left: 18px; }
+
+.grip {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fx-icon-quiet);
+  cursor: grab;
+}
+.grip:active { cursor: grabbing; }
+
+/* checkbox */
+.cb { display: flex; align-items: center; cursor: pointer; }
+.cb__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+.cb__box {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--fx-border-strong);
+  border-radius: 5px;
+  background: var(--fx-surface);
+  color: transparent;
+  transition: background-color .12s, border-color .12s;
+}
+.cb:hover .cb__box { border-color: var(--fx-blue); }
+.cb__input:checked + .cb__box {
+  background: var(--fx-blue);
+  border-color: var(--fx-blue);
+  color: #fff;
+}
+.cb__input:focus-visible + .cb__box { outline: 2px solid var(--fx-blue); outline-offset: 2px; }
+
+/* fields */
+.cell { position: relative; display: flex; align-items: center; min-width: 0; }
+
+.field {
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  font: 400 13px/1 var(--fx-font);
+  color: var(--fx-text);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius);
+  transition: border-color .12s, box-shadow .12s, color .12s;
+}
+.field::placeholder { color: var(--fx-text-off); }
+.field:hover { border-color: var(--fx-border-strong); }
+.field:focus {
+  outline: none;
+  border-color: var(--fx-blue);
+  box-shadow: 0 0 0 3px var(--fx-ring);
+}
+.field--invalid, .field--invalid:hover { border-color: var(--fx-red); }
+.field--invalid:focus { box-shadow: 0 0 0 3px rgba(217, 45, 32, .16); }
+
+/* the header-name field doubles as a picker for the common headers.
+   The chevron stays out of sight until the row is touched, so a filled-in row
+   looks exactly like the reference design. */
+.field--combo { padding-right: 24px; }
+
+.combo__btn {
+  position: absolute;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--fx-text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s, color .12s;
+}
+.combo__btn:hover { color: var(--fx-text-mid); }
+.cell--combo:hover .combo__btn,
+.cell--combo:focus-within .combo__btn,
+.cell--combo:has(.js-name:placeholder-shown) .combo__btn,
+.combo__btn[aria-expanded="true"] { opacity: 1; }
+.combo__btn[aria-expanded="true"] { color: var(--fx-blue-text); }
+.row--off .combo__btn { color: var(--fx-icon-off); }
+
+.cell--combo .cell__tag { right: 26px; }
+
+.cell__tag {
+  position: absolute;
+  right: 8px;
+  padding: 1px 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--fx-text-muted);
+  background: var(--fx-surface-sub);
+  border: 1px solid var(--fx-border-soft);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* a row whose header is switched off */
+.row--off .field { color: var(--fx-text-off); border-color: var(--fx-border-soft); }
+.row--off .field::placeholder { color: var(--fx-icon-off); }
+.row--off .cb__box { border-color: var(--fx-border-soft); }
+.row--off .grip { color: var(--fx-icon-off); }
+.row--off .iconbtn { color: var(--fx-icon-off); }
+.row--off .iconbtn:hover { color: var(--fx-icon); background: var(--fx-surface-hover); }
+.row--off .cell__tag { color: var(--fx-text-off); }
+
+.row--selected { background: #f5f9ff; }
+html[data-theme="dark"] .row--selected { background: #16243a; }
+.row--dragging { opacity: .35; }
+.row--drop-before { box-shadow: inset 0 2px 0 var(--fx-blue); }
+.row--drop-after { box-shadow: inset 0 -2px 0 var(--fx-blue); }
+
+.empty {
+  margin: 0;
+  padding: 26px var(--fx-pad-r) 22px calc(var(--fx-pad-l) + 32px);
+  font-size: 13px;
+  color: var(--fx-text-muted);
+  border-bottom: 1px solid var(--fx-separator);
+}
+
+/* add header */
+.grid__add { padding: 12px 17px; }
+
+.addbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  /* a stated width, so a wider platform font cannot grow the button */
+  width: 155px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: var(--fx-blue-soft);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  color: var(--fx-blue-text);
+  cursor: pointer;
+  transition: background-color .12s;
+}
+.addbtn:hover { background: var(--fx-blue-soft-hover); }
+.addbtn .ic { stroke-width: 2.4; }
+
+/* ── bulk bar ────────────────────────────────────────────────────────── */
+
+.bulkbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+  padding: 0 17px 0 14px;
+  background: #f1f7ff;
+  border-top: 1px solid var(--fx-border-soft);
+  font-size: 12.5px;
+  color: var(--fx-text-mid);
+}
+html[data-theme="dark"] .bulkbar { background: #13233c; }
+.bulkbar__count b { color: var(--fx-text); }
+.bulkbar__actions { display: flex; gap: 6px; margin-left: auto; }
+
+.minibtn {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--fx-border);
+  border-radius: 6px;
+  background: var(--fx-surface);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fx-text-mid);
+  cursor: pointer;
+}
+.minibtn:hover { border-color: var(--fx-border-strong); color: var(--fx-text); }
+.minibtn--danger { color: var(--fx-red); }
+.minibtn--danger:hover { border-color: var(--fx-red); color: var(--fx-red); background: var(--fx-red-soft); }
+.minibtn--quiet { border-color: transparent; background: none; color: var(--fx-text-muted); }
+
+/* ── status bar ──────────────────────────────────────────────────────── */
+
+.statusbar {
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 23px 0 20px;
+  background: var(--fx-surface-sub);
+  border-top: 1px solid var(--fx-divider);
+}
+
+.statusbar__state {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-size: 13.5px;
+  color: var(--fx-text-mid);
+  text-align: left;
+  cursor: pointer;
+}
+.statusbar__state:hover > span { text-decoration: underline; }
+.statusbar__state > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.statusbar__state b { font-weight: 500; color: var(--fx-blue-text); }
+
+.dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  margin-right: 14px;
+  border-radius: 50%;
+  background: var(--fx-green);
+}
+.dot[data-state="idle"] { background: var(--fx-text-off); }
+.dot[data-state="paused"] { background: var(--fx-amber); }
+.dot[data-state="error"] { background: var(--fx-red); }
+
+.linkbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fx-blue-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.linkbtn:hover { text-decoration: underline; }
+
+/* ── menu ────────────────────────────────────────────────────────────── */
+
+.menu {
+  position: fixed;
+  z-index: 40;
+  min-width: 218px;
+  padding: 6px;
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  border-radius: 10px;
+  box-shadow: var(--fx-shadow-menu);
+}
+.menu[hidden] { display: none; }
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-size: 13px;
+  color: var(--fx-text-mid);
+  text-align: left;
+  cursor: pointer;
+}
+.menu__item .ic { color: var(--fx-icon-quiet); }
+.menu__item:hover { background: var(--fx-surface-hover); color: var(--fx-text); }
+.menu__item:hover .ic { color: var(--fx-icon); }
+.menu__item--danger { color: var(--fx-red); }
+.menu__item--danger .ic, .menu__item--danger:hover .ic { color: var(--fx-red); }
+.menu__item--danger:hover { background: var(--fx-red-soft); color: var(--fx-red); }
+.menu__item:disabled { color: var(--fx-text-off); background: none; cursor: default; }
+.menu__item:disabled .ic { color: var(--fx-icon-off); }
+.menu__sep { display: block; height: 1px; margin: 5px 6px; background: var(--fx-border-soft); }
+
+/* the common-header listbox */
+.menu--list { min-width: 252px; max-height: 296px; overflow-y: auto; scrollbar-width: thin; }
+.menu__group {
+  display: block;
+  padding: 8px 10px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--fx-text-faint);
+}
+.menu__group:first-child { padding-top: 3px; }
+.menu--list .menu__item { height: 28px; font-size: 12.5px; }
+.menu--list .menu__item[aria-selected="true"] {
+  background: var(--fx-blue-soft);
+  color: var(--fx-blue-text);
+  font-weight: 500;
+}
+.menu__item--accent {
+  color: var(--fx-blue-text);
+  font-weight: 500;
+  border-top: 1px solid var(--fx-border-soft);
+  border-radius: 0 0 6px 6px;
+  margin-top: 4px;
+}
+.menu__item--accent .ic, .menu__item--accent:hover .ic { color: var(--fx-blue-text); }
+.menu__item--accent:hover { background: var(--fx-blue-soft); color: var(--fx-blue-text); }
+
+/* ── dialogs ─────────────────────────────────────────────────────────── */
+
+.sheet {
+  width: 620px;
+  max-width: calc(100vw - 36px);
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 1px solid var(--fx-border);
+  border-radius: 14px;
+  background: var(--fx-surface);
+  color: var(--fx-text);
+  box-shadow: var(--fx-shadow-sheet);
+  overflow: hidden;
+}
+.sheet--sm { width: 420px; }
+.sheet::backdrop { background: rgba(7, 33, 67, .38); }
+
+.sheet__form { display: flex; flex-direction: column; max-height: calc(100vh - 32px); }
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 14px 15px 20px;
+  border-bottom: 1px solid var(--fx-border-soft);
+}
+.sheet__title { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -.005em; }
+.sheet__head .iconbtn { margin-left: auto; width: 30px; height: 30px; }
+
+.sheet__body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+.sheet__lede { margin: 0; font-size: 13px; color: var(--fx-text-muted); }
+
+.sheet__foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  background: var(--fx-surface-sub);
+  border-top: 1px solid var(--fx-border-soft);
+}
+.spacer { flex: 1; }
+
+.f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.fld { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fld--row { flex-direction: row; align-items: center; gap: 10px; font-size: 13px; color: var(--fx-text-mid); }
+.fld__label { font-size: 12px; font-weight: 600; color: var(--fx-text-mid); }
+.fld__label em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--fx-text-faint);
+  margin-left: 6px;
+}
+
+.input {
+  width: 100%;
+  height: 34px;
+  padding: 0 11px;
+  font: 400 13px/1 var(--fx-font);
+  color: var(--fx-text);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--fx-blue);
+  box-shadow: 0 0 0 3px var(--fx-ring);
+}
+.input--area {
+  height: auto;
+  padding: 9px 11px;
+  line-height: 1.5;
+  font-family: var(--fx-mono);
+  font-size: 12px;
+  resize: vertical;
+}
+.input--invalid, .input--invalid:focus { border-color: var(--fx-red); }
+
+.cbx { width: 16px; height: 16px; margin: 0; accent-color: var(--fx-blue); }
+
+.seg {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--fx-surface-sub);
+  border: 1px solid var(--fx-border);
+  border-radius: var(--fx-radius);
+}
+.seg__btn {
+  height: 28px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fx-text-muted);
+  cursor: pointer;
+}
+.seg__btn[aria-checked="true"] {
+  background: var(--fx-surface);
+  color: var(--fx-text);
+  /* the surfaces are 4 points apart in dark theme, so the pill needs an edge */
+  box-shadow: inset 0 0 0 1px var(--fx-border), 0 1px 2px rgba(9, 26, 51, .12);
+}
+/* The pill's fill is only a shade off the track in dark theme, so the selected
+   state borrows the accent treatment the chips already use — the measured edge
+   contrast goes from 1.5:1 to 4.2:1. */
+html[data-theme="dark"] .seg__btn[aria-checked="true"] {
+  background: var(--fx-blue-soft);
+  color: var(--fx-blue-text);
+  box-shadow: inset 0 0 0 1px var(--fx-blue);
+}
+
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--fx-border);
+  border-radius: 999px;
+  background: var(--fx-surface);
+  font-size: 12px;
+  color: var(--fx-text-mid);
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] {
+  background: var(--fx-blue-soft);
+  border-color: var(--fx-blue-soft-hover);
+  color: var(--fx-blue-text);
+  font-weight: 500;
+}
+
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--fx-amber);
+}
+.hint .ic { margin-top: 2px; color: var(--fx-amber); }
+.hint[hidden] { display: none; }
+
+.help { font-size: 12.5px; color: var(--fx-text-muted); }
+.help summary { cursor: pointer; color: var(--fx-text-mid); font-weight: 500; }
+.help ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.help code {
+  font: 400 11.5px/1.4 var(--fx-mono);
+  padding: 1px 4px;
+  background: var(--fx-surface-sub);
+  border: 1px solid var(--fx-border-soft);
+  border-radius: 4px;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--fx-radius);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+}
+.btn--primary { background: var(--fx-blue); color: #fff; }
+.btn--primary:hover { background: var(--fx-blue-hover); }
+.btn--ghost { border-color: var(--fx-border); background: var(--fx-surface); color: var(--fx-text-mid); }
+.btn--ghost:hover { border-color: var(--fx-border-strong); color: var(--fx-text); }
+.btn--danger { background: var(--fx-red); color: #fff; }
+.btn--danger:hover { filter: brightness(.93); }
+.btn--danger-ghost { color: var(--fx-red); }
+.btn--danger-ghost:hover { background: var(--fx-red-soft); }
+
+/* ── toast ───────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  z-index: 60;
+  transform: translateX(-50%);
+  max-width: 560px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: var(--fx-toast);
+  color: #fff;
+  font-size: 12.5px;
+  box-shadow: var(--fx-shadow-menu);
+  animation: fx-toast .18s ease;
+}
+.toast[hidden] { display: none; }
+.toast--error { background: var(--fx-red); }
+
+@keyframes fx-toast {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── touch devices ───────────────────────────────────────────────────── */
+
+/* Firefox for Android opens the popup in the device viewport, which is around
+   412px on a phone against the 740px this design is built for — the Action column
+   ended up hundreds of pixels off-screen. Here the row stops using fixed tracks
+   and the value field moves onto its own line. Everything above is untouched, so
+   the 740px layout stays exact.
+
+   Selected by the pointer, not by the viewport width alone. Width on its own
+   cannot be used: Chrome sizes a popup from its content's preferred width, so a
+   width query that then changes that width feeds back into itself. This branch
+   wants about 340px — comfortably under any threshold that would select it — so
+   both states were self-consistent, and a single layout pass that started narrow
+   (one zoom step above 100% was enough) left the panel latched at 340px with no
+   way back. A desktop pointer is never coarse, so desktop cannot enter this
+   branch at all and the fixed width above always holds. The width bound is kept
+   as well, so a tablet wider than the panel still gets the designed layout. */
+@media (hover: none) and (pointer: coarse) and (max-width: 739px) {
+  html, body { width: 100%; min-width: 320px; }
+  body { overflow-y: auto; }
+
+  .topbar { height: auto; min-height: 56px; padding: 10px 14px; }
+  .brand { gap: 10px; }
+  .brand__mark { width: 30px; height: 35px; }
+  .brand__name { font-size: 19px; }
+  .power { gap: 10px; }
+  .topbar__rule { margin: 0 10px; }
+  .iconbtn--dark { width: 30px; height: 30px; }
+
+  .profilebar { height: auto; flex-wrap: wrap; row-gap: 10px; padding: 12px 14px; }
+  .profilebar__label { margin-right: 12px; }
+  .select { flex: 1 1 auto; width: auto; min-width: 140px; }
+  .profilebar__end { flex: 1 1 100%; justify-content: flex-end; margin-left: 0; }
+
+  /* The heads label a grid that no longer exists at this width. */
+  .grid__head { display: none; }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    height: auto;
+    padding: 10px 14px;
+    column-gap: 10px;
+    row-gap: 8px;
+  }
+  .row > .grip,
+  .row > .cb,
+  .row > .cell,
+  .row > .sw-wrap,
+  .row > .js-edit,
+  .row > .js-delete { padding-left: 0; margin-left: 0; }
+  .row > .cell:nth-of-type(1) { flex: 1 1 120px; order: 1; }
+  .row > .sw-wrap { order: 2; margin-left: auto; }
+  .row > .js-edit { order: 3; }
+  .row > .js-delete { order: 4; }
+  .row > .cell:nth-of-type(2) { flex: 1 1 100%; order: 5; }
+
+  .grid__body { max-height: none; }
+  .grid__add { padding: 12px 14px; }
+  .empty { padding-left: 14px; padding-right: 14px; }
+
+  .bulkbar {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    padding: 8px 14px;
+  }
+  .bulkbar__actions { flex-wrap: wrap; margin-left: 0; }
+
+  .statusbar {
+    height: auto;
+    min-height: 44px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 10px 14px;
+  }
+
+  .sheet { width: calc(100vw - 20px); }
+  .f2 { grid-template-columns: 1fr; }
+}
