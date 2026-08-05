@@ -29,6 +29,16 @@ everything lives in the browser's local storage on the device.
 - A keyboard shortcut for the master switch.
 - Light and dark themes, or follow the system setting.
 
+## Install
+
+**Firefox — [get it from addons.mozilla.org][amo].** Signed and reviewed by Mozilla, and it updates
+itself.
+
+Chrome and Edge are not in a store yet; build them from source below. The build is the same one the
+store package is cut from, so nothing is missing from it.
+
+[amo]: https://addons.mozilla.org/firefox/addon/nod-header/
+
 ## Install from source
 
 There is nothing to install to build this. The project has no runtime dependencies and the build
@@ -75,7 +85,8 @@ npm run build:firefox
 3. Click **Load Temporary Add-on** and select `dist/firefox/manifest.json`.
 
 A temporary add-on is removed when Firefox restarts, and its storage goes with it. Export anything
-you want to keep before you close the browser.
+you want to keep before you close the browser — or install [from addons.mozilla.org][amo] instead,
+which persists and updates itself. Load it from source only when you are changing the code.
 
 ### Supported versions
 
